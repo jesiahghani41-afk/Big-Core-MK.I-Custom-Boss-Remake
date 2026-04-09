@@ -1,6 +1,5 @@
-include "music_defines"
-
 function void Music.Boss.AIZ1()
 {
-	Music.Play("aircraft_carrier", 0, 0)
+	// "aircraft_carrier" is the ID defined in audio_replacements.json
+	playMusic("aircraft_carrier")
 }

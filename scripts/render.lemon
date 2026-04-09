@@ -1,18 +1,24 @@
-include "render_defines"
-
 function void Render.BigCore(int state)
 {
-	// Render the Big Core based on its state (e.g., normal, hit)
-	// This is a placeholder and will need actual rendering logic
-	// based on the boss's animation and damage state.
+	// Render the Big Core based on its state
+	// 0: Normal, 1: Hit, 2: Laser
+	
+	if (state == 0)
+	{
+		Renderer.drawCustomSprite("bigcore_normal", objA0.position.x.u16, objA0.position.y.u16, 0, objA0.render_flags, 0x8000)
+	}
+	else if (state == 1)
+	{
+		Renderer.drawCustomSprite("bigcore_hits", objA0.position.x.u16, objA0.position.y.u16, 0, objA0.render_flags, 0x8000)
+	}
+	else if (state == 2)
+	{
+		// Render laser projectile
+		Renderer.drawCustomSprite("bigcore_laser", objA0.position.x.u16, objA0.position.y.u16, 0, objA0.render_flags, 0x8000)
+	}
+}
 
-	if (state == 0) // Normal state
-	{
-		RenderSprite("bigcore_normal", 0, 0, 0)
-	}
-	else if (state == 1) // Hit state
-	{
-		RenderSprite("bigcore_hits", 0, 0, 0)
-	}
-	// Add more states as needed for animation or specific attacks
+function void Render.BigCore.Laser(u16 px, u16 py, u8 render_flags)
+{
+	Renderer.drawCustomSprite("bigcore_laser", px, py, 0, render_flags, 0x8000)
 }
