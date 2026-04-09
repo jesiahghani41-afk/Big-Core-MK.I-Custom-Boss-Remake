@@ -1,0 +1,18 @@
+include "render_defines"
+
+function void Render.BigCore(int state)
+{
+	// Render the Big Core based on its state (e.g., normal, hit)
+	// This is a placeholder and will need actual rendering logic
+	// based on the boss's animation and damage state.
+
+	if (state == 0) // Normal state
+	{
+		RenderSprite("bigcore_normal", 0, 0, 0)
+	}
+	else if (state == 1) // Hit state
+	{
+		RenderSprite("bigcore_hits", 0, 0, 0)
+	}
+	// Add more states as needed for animation or specific attacks
+}

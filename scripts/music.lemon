@@ -1,0 +1,6 @@
+include "music_defines"
+
+function void Music.Boss.AIZ1()
+{
+	Music.Play("aircraft_carrier", 0, 0)
+}

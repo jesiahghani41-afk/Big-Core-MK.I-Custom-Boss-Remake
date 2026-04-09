@@ -1,0 +1,64 @@
+include "boss_defines"
+include "render"
+include "music"
+
+//# address-hook(0x068a24) end(0x068a32)
+function void Boss.AIZ1.BaseUpdate()
+{
+	// Initialize Big Core MK.I
+	if (objA0.base_state == 0x00)
+	{
+		setupObjectAttributesFull(0x068ffe)
+		boss.remaining_hits = 6 // Example hit points
+		level.boss_encounter = 1
+		requestLoadingPatterns(0x5a) // Boss sprites (placeholder, actual Big Core sprites will be loaded via render.lemon)
+		loadPaletteLine1(0x06917c)
+		
+		objA0.base_state = 0x02 // Move to next state
+		Boss.BigCore.Init()
+	}
+	
+	// Call the main update function for Big Core
+	Boss.BigCore.Update()
+	
+	// Render the Big Core
+	Render.BigCore(0) // Pass a state for rendering (e.g., 0 for normal)
+}
+
+function void Boss.BigCore.Init()
+{
+	// Placeholder for Big Core initialization logic
+	// e.g., set initial position, velocities, etc.
+	objA0.position.x.u16 = camera.position.x.u16 + 200
+	objA0.position.y.u16 = camera.position.y.u16 + 100
+	
+	// Play boss music
+	Music.Boss.AIZ1()
+}
+
+function void Boss.BigCore.Update()
+{
+	// Placeholder for Big Core update logic
+	// This is where movement, attacks, and state transitions will be handled
+	// For now, let's just make it move slightly
+	objA0.position.x.u16 -= 1 // Example movement
+	
+	// Check for hits and update remaining_hits
+	// This will be more complex in a full implementation
+	// if (isObjectHit(objA0))
+	// {
+	//		boss.remaining_hits--
+	//		Boss.updateHitFlashing(4, 0x068fe6, 0x068fee)
+	// }
+	
+	// If boss is defeated
+	if (boss.remaining_hits == 0)
+	{
+		// Trigger boss defeat sequence
+		// objA0.update_address = 0x085668
+		// objA0.countdown_callback = 0x068c02
+		// AddScoreForBossEnemy()
+		// level.boss_encounter = 0
+		// PlayMusicAfterLevelResults()
+	}
+}
