@@ -1,12 +1,6 @@
 // Big Core MK.I Boss Script for Sonic 3 A.I.R.
 // Replaces AIZ 1 Fire Breath Boss
 
-// Global variables for boss state and health
-global u8 bigcore.health
-global u8 bigcore.state
-global u8 bigcore.timer
-global u16 bigcore.target_y
-
 // State machine constants
 #define BIGCORE_STATE_INIT      0x00
 #define BIGCORE_STATE_WAIT      0x02
@@ -14,6 +8,7 @@ global u16 bigcore.target_y
 #define BIGCORE_STATE_FIGHT     0x06
 #define BIGCORE_STATE_DEFEATED  0x08
 
+// Hook for AIZ1 Fire Breath Boss
 //# address-hook(0x068a24) end(0x068a32)
 function void Boss.AIZ1.BaseUpdate()
 {
@@ -44,7 +39,12 @@ function void Boss.AIZ1.BaseUpdate()
 	// Render the boss
 	if (objA0.base_state != BIGCORE_STATE_INIT)
 	{
-		u8 render_state = (objA0.value3b > 0) ? 1 : 0; // Flash when hit
+		u8 render_state = 0; // Normal
+		if (objA0.value3b > 0)
+			render_state = 1; // Flash when hit
+		else if (objA0.value3c > 0)
+			render_state = 2; // Laser firing
+			
 		Render.BigCore(render_state)
 	}
 }
@@ -56,6 +56,7 @@ function void Boss.BigCore.Init()
 	boss.remaining_hits = bigcore.health
 	level.boss_encounter = 1
 	
+	// Start off-screen to the right
 	objA0.position.x.u16 = camera.position.x.u16 + 400
 	objA0.position.y.u16 = camera.position.y.u16 + 100
 	
@@ -66,8 +67,8 @@ function void Boss.BigCore.Init()
 function void Boss.BigCore.WaitForPlayer()
 {
 	// Wait until the player reaches the boss arena
-	u16 trigger_x = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0;
-	if (camera.position.x.u16 >= trigger_x)
+	// Trigger at specific X coordinate in AIZ1
+	if (camera.position.x.u16 >= 0x10c0)
 	{
 		objA0.base_state = BIGCORE_STATE_ENTER
 		bigcore.state = BIGCORE_STATE_ENTER
@@ -77,11 +78,11 @@ function void Boss.BigCore.WaitForPlayer()
 
 function void Boss.BigCore.Entrance()
 {
-	// Move into the screen
-	u16 target_x = camera.position.x.u16 + 240;
+	// Move into the screen from the right
+	u16 target_x = camera.position.x.u16 + 240
 	if (objA0.position.x.u16 > target_x)
 	{
-		objA0.position.x.u16 -= 2;
+		objA0.position.x.u16 -= 2
 	}
 	else
 	{
@@ -95,15 +96,15 @@ function void Boss.BigCore.FightLoop()
 {
 	bigcore.timer++
 	
-	// Hover movement: Track player Y position loosely
+	// Gradius-style movement: slow vertical tracking
 	u16 player_y = char.position.y.u16
-	if (objA0.position.y.u16 < player_y - 20)
+	if (objA0.position.y.u16 < player_y - 10)
 		objA0.position.y.u16 += 1
-	else if (objA0.position.y.u16 > player_y + 20)
+	else if (objA0.position.y.u16 > player_y + 10)
 		objA0.position.y.u16 -= 1
 		
-	// Periodic laser fire
-	if (bigcore.timer % 150 == 0)
+	// Periodic laser fire (every ~2 seconds at 60fps)
+	if (bigcore.timer % 120 == 0)
 	{
 		Boss.BigCore.FireLaser()
 	}
@@ -111,10 +112,12 @@ function void Boss.BigCore.FightLoop()
 
 function void Boss.BigCore.FireLaser()
 {
+	// Play laser sound
 	playSound(0x4f)
-	// In S3AIR, we'd typically spawn a child object for the laser.
-	// For this mod, we'll use a simplified approach or spawn a dedicated laser object if defined.
-	// Since we don't have a laser object script yet, let's just trigger the sound for now.
+	
+	// For now, we'll use the laser render state to show the firing effect
+	// In a full implementation, this would spawn a separate projectile object
+	objA0.value3c = 15 // Laser firing timer for visual effect
 }
 
 function void Boss.BigCore.CheckCollisions()
@@ -129,7 +132,7 @@ function void Boss.BigCore.CheckCollisions()
 				bigcore.health--
 				boss.remaining_hits = bigcore.health
 				objA0.value3b = 30 // Flash timer
-				playSound(0x6e)
+				playSound(0x6e) // Hit sound
 				
 				if (bigcore.health == 0)
 				{
@@ -139,8 +142,12 @@ function void Boss.BigCore.CheckCollisions()
 		}
 	}
 	
+	// Decrement timers
 	if (objA0.value3b > 0)
 		objA0.value3b--
+		
+	if (objA0.value3c > 0)
+		objA0.value3c--
 }
 
 function void Boss.BigCore.OnDefeat()
@@ -149,9 +156,10 @@ function void Boss.BigCore.OnDefeat()
 	bigcore.state = BIGCORE_STATE_DEFEATED
 	level.boss_encounter = 0
 	
-	// Trigger explosions and finish boss
+	// Standard S3K boss defeat sequence
 	SetupAsSignpostSpawner()
-	
-	// Award points
 	AddScoreForBossEnemy()
+	
+	// Stop boss music and play victory fanfare
+	playMusic(MUSIC_CTRL_STOP)
 }

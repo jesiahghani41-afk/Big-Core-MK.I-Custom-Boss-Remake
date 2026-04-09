@@ -1,3 +1,10 @@
+// Global variables for Big Core MK.I Custom Boss
+global u8 bigcore.health
+global u8 bigcore.state
+global u8 bigcore.timer
+global u16 bigcore.target_y
+
+// Include other scripts
 include bigcore_boss_aiz1
 include render
 include music
