@@ -1,6 +1,12 @@
 // Big Core MK.I Boss Script for Sonic 3 A.I.R.
 // Replaces AIZ 1 Fire Breath Boss
 
+// Global variables for boss state and health
+global u8 bigcore.health
+global u8 bigcore.state
+global u8 bigcore.timer
+global u16 bigcore.target_y
+
 // State machine constants
 #define BIGCORE_STATE_INIT      0x00
 #define BIGCORE_STATE_WAIT      0x02
@@ -46,12 +52,14 @@ function void Boss.AIZ1.BaseUpdate()
 function void Boss.BigCore.Init()
 {
 	setupObjectAttributesFull(0x068ffe)
-	boss.remaining_hits = 8
+	bigcore.health = 8
+	boss.remaining_hits = bigcore.health
 	level.boss_encounter = 1
 	
 	objA0.position.x.u16 = camera.position.x.u16 + 400
 	objA0.position.y.u16 = camera.position.y.u16 + 100
 	
+	bigcore.state = BIGCORE_STATE_WAIT
 	objA0.base_state = BIGCORE_STATE_WAIT
 }
 
@@ -62,6 +70,7 @@ function void Boss.BigCore.WaitForPlayer()
 	if (camera.position.x.u16 >= trigger_x)
 	{
 		objA0.base_state = BIGCORE_STATE_ENTER
+		bigcore.state = BIGCORE_STATE_ENTER
 		Music.Boss.AIZ1()
 	}
 }
@@ -77,18 +86,24 @@ function void Boss.BigCore.Entrance()
 	else
 	{
 		objA0.base_state = BIGCORE_STATE_FIGHT
-		objA0.value3a = 0 // Internal timer/state
+		bigcore.state = BIGCORE_STATE_FIGHT
+		bigcore.timer = 0
 	}
 }
 
 function void Boss.BigCore.FightLoop()
 {
-	// Simple movement pattern: hover up and down
-	objA0.value3a++
-	objA0.position.y.u16 = camera.position.y.u16 + 100 + lookupSin(objA0.value3a * 2) / 4;
+	bigcore.timer++
 	
-	// Fire lasers periodically
-	if (objA0.value3a % 120 == 0)
+	// Hover movement: Track player Y position loosely
+	u16 player_y = char.position.y.u16
+	if (objA0.position.y.u16 < player_y - 20)
+		objA0.position.y.u16 += 1
+	else if (objA0.position.y.u16 > player_y + 20)
+		objA0.position.y.u16 -= 1
+		
+	// Periodic laser fire
+	if (bigcore.timer % 150 == 0)
 	{
 		Boss.BigCore.FireLaser()
 	}
@@ -96,26 +111,27 @@ function void Boss.BigCore.FightLoop()
 
 function void Boss.BigCore.FireLaser()
 {
-	// Spawn laser projectiles
-	// In a real implementation, we'd spawn child objects. 
-	// For now, let's play a sound.
 	playSound(0x4f)
+	// In S3AIR, we'd typically spawn a child object for the laser.
+	// For this mod, we'll use a simplified approach or spawn a dedicated laser object if defined.
+	// Since we don't have a laser object script yet, let's just trigger the sound for now.
 }
 
 function void Boss.BigCore.CheckCollisions()
 {
 	// Handle player hitting the boss
-	if (boss.remaining_hits > 0)
+	if (bigcore.health > 0)
 	{
 		if (Object.CheckCollisionWithPlayers())
 		{
 			if (canCharacterHurtBoss())
 			{
-				boss.remaining_hits--
+				bigcore.health--
+				boss.remaining_hits = bigcore.health
 				objA0.value3b = 30 // Flash timer
 				playSound(0x6e)
 				
-				if (boss.remaining_hits == 0)
+				if (bigcore.health == 0)
 				{
 					Boss.BigCore.OnDefeat()
 				}
@@ -130,6 +146,7 @@ function void Boss.BigCore.CheckCollisions()
 function void Boss.BigCore.OnDefeat()
 {
 	objA0.base_state = BIGCORE_STATE_DEFEATED
+	bigcore.state = BIGCORE_STATE_DEFEATED
 	level.boss_encounter = 0
 	
 	// Trigger explosions and finish boss

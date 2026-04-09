@@ -22,3 +22,33 @@ function void Render.BigCore.Laser(u16 px, u16 py, u8 render_flags)
 {
 	Renderer.drawCustomSprite("bigcore_laser", px, py, 0, render_flags, 0x8000)
 }
+
+function void Render.BigCore.HUD()
+{
+	// Render custom boss bar for Big Core MK.I
+	if (level.boss_encounter == 1 && bigcore.health > 0)
+	{
+		u16 x = 40
+		u16 y = 180
+		
+		// Draw the bar background
+		Renderer.drawCustomSprite("bigcore_mk1_bar", x, y, 0, 0, 0xffff)
+		
+		// Draw health segments
+		for (u8 i = 0; i < 8; ++i)
+		{
+			string sprite = (i < bigcore.health) ? "bigcore_health_full" : "bigcore_health_empty"
+			Renderer.drawCustomSprite(sprite, x + 30 + i * 10, y + 4, 0, 0, 0xffff)
+		}
+		
+		// Draw icon
+		Renderer.drawCustomSprite("bigcore_icon", x - 10, y + 8, 0, 0, 0xffff)
+	}
+}
+
+//# address-hook(0x008500) // Hook into HUD rendering if needed
+function void Render.HUD.Base()
+{
+	base.Render.HUD.Base()
+	Render.BigCore.HUD()
+}
