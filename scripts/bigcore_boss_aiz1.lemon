@@ -1,5 +1,6 @@
 // Big Core MK.I Boss Script for Sonic 3 A.I.R. (26.03.28.0)
 // Replaces AIZ 1 Fire Breath Boss with Big Core MK.I from Gradius
+// Rewritten to use global variables for state management and proper hooks
 
 // State machine constants
 #define BIGCORE_STATE_INIT      0x00
@@ -8,44 +9,45 @@
 #define BIGCORE_STATE_FIGHT     0x06
 #define BIGCORE_STATE_DEFEATED  0x08
 
-// Hook for AIZ1 Fire Breath Boss
+// Hook for AIZ1 Fire Breath Boss base update
 //# address-hook(0x068a24) end(0x068a32)
 function void Boss.AIZ1.BaseUpdate()
 {
 	// Main entry point for the boss update loop
-	if (objA0.base_state == BIGCORE_STATE_INIT)
+	if (BigCore.State == BIGCORE_STATE_INIT)
 	{
 		Boss.BigCore.Init()
 	}
-	else if (objA0.base_state == BIGCORE_STATE_WAIT)
+	else if (BigCore.State == BIGCORE_STATE_WAIT)
 	{
 		Boss.BigCore.WaitForPlayer()
 	}
-	else if (objA0.base_state == BIGCORE_STATE_ENTER)
+	else if (BigCore.State == BIGCORE_STATE_ENTER)
 	{
 		Boss.BigCore.Entrance()
 	}
-	else if (objA0.base_state == BIGCORE_STATE_FIGHT)
+	else if (BigCore.State == BIGCORE_STATE_FIGHT)
 	{
 		Boss.BigCore.FightLoop()
 	}
-	else if (objA0.base_state == BIGCORE_STATE_DEFEATED)
+	else if (BigCore.State == BIGCORE_STATE_DEFEATED)
 	{
-		// Defeated logic handled by standard SignpostSpawner or custom defeat sequence
+		// Defeated logic
+		Boss.BigCore.OnDefeat()
 	}
 	
-	// Update global position variables for other scripts (like rendering)
-	BigCore.PosX = objA0.position.x.u16
-	BigCore.PosY = objA0.position.y.u16
+	// Update object position from global variables for rendering and collision
+	objA0.position.x.u16 = BigCore.PosX
+	objA0.position.y.u16 = BigCore.PosY
 	
 	// Handle hits and damage
-	if (objA0.base_state != BIGCORE_STATE_INIT && objA0.base_state != BIGCORE_STATE_DEFEATED)
+	if (BigCore.State != BIGCORE_STATE_INIT && BigCore.State != BIGCORE_STATE_DEFEATED)
 	{
 		Boss.BigCore.CheckCollisions()
 	}
 	
 	// Render the boss
-	if (objA0.base_state != BIGCORE_STATE_INIT)
+	if (BigCore.State != BIGCORE_STATE_INIT)
 	{
 		u8 render_state = 0; // Normal
 		if (objA0.value3b > 0)
@@ -65,11 +67,10 @@ function void Boss.BigCore.Init()
 	level.boss_encounter = 1
 	
 	// Start off-screen to the right
-	objA0.position.x.u16 = camera.position.x.u16 + 400
-	objA0.position.y.u16 = camera.position.y.u16 + 100
+	BigCore.PosX = camera.position.x.u16 + 400
+	BigCore.PosY = camera.position.y.u16 + 100
 	
 	BigCore.State = BIGCORE_STATE_WAIT
-	objA0.base_state = BIGCORE_STATE_WAIT
 }
 
 function void Boss.BigCore.WaitForPlayer()
@@ -80,7 +81,6 @@ function void Boss.BigCore.WaitForPlayer()
 	
 	if (camera.position.x.u16 >= target_x)
 	{
-		objA0.base_state = BIGCORE_STATE_ENTER
 		BigCore.State = BIGCORE_STATE_ENTER
 		Music.Boss.AIZ1()
 	}
@@ -90,13 +90,12 @@ function void Boss.BigCore.Entrance()
 {
 	// Move into the screen from the right
 	u16 target_x = camera.position.x.u16 + 240
-	if (objA0.position.x.u16 > target_x)
+	if (BigCore.PosX > target_x)
 	{
-		objA0.position.x.u16 -= 2
+		BigCore.PosX -= 2
 	}
 	else
 	{
-		objA0.base_state = BIGCORE_STATE_FIGHT
 		BigCore.State = BIGCORE_STATE_FIGHT
 		BigCore.Timer = 0
 	}
@@ -108,10 +107,10 @@ function void Boss.BigCore.FightLoop()
 	
 	// Gradius-style movement: slow vertical tracking
 	u16 player_y = char.position.y.u16
-	if (objA0.position.y.u16 < player_y - 10)
-		objA0.position.y.u16 += 1
-	else if (objA0.position.y.u16 > player_y + 10)
-		objA0.position.y.u16 -= 1
+	if (BigCore.PosY < player_y - 10)
+		BigCore.PosY += 1
+	else if (BigCore.PosY > player_y + 10)
+		BigCore.PosY -= 1
 		
 	// Periodic laser fire (every ~2 seconds at 60fps)
 	if (BigCore.Timer % 120 == 0)
@@ -125,7 +124,7 @@ function void Boss.BigCore.FireLaser()
 	// Play laser sound
 	playSound(0x4f)
 	
-	// Set laser firing visual timer
+	// Set laser firing visual timer (using object field for convenience)
 	objA0.value3c = 15
 }
 
@@ -145,13 +144,13 @@ function void Boss.BigCore.CheckCollisions()
 				
 				if (BigCore.Health == 0)
 				{
-					Boss.BigCore.OnDefeat()
+					BigCore.State = BIGCORE_STATE_DEFEATED
 				}
 			}
 		}
 	}
 	
-	// Decrement timers
+	// Decrement visual timers
 	if (objA0.value3b > 0)
 		objA0.value3b--
 		
@@ -161,8 +160,6 @@ function void Boss.BigCore.CheckCollisions()
 
 function void Boss.BigCore.OnDefeat()
 {
-	objA0.base_state = BIGCORE_STATE_DEFEATED
-	BigCore.State = BIGCORE_STATE_DEFEATED
 	level.boss_encounter = 0
 	
 	// Standard S3K boss defeat sequence
@@ -171,4 +168,7 @@ function void Boss.BigCore.OnDefeat()
 	
 	// Stop boss music and play victory fanfare
 	playMusic(MUSIC_CTRL_STOP)
+	
+	// Final state cleanup
+	BigCore.State = 0xff // Mark as fully done
 }
