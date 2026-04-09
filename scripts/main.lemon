@@ -1,10 +1,29 @@
-// Global variables for Big Core MK.I Custom Boss
-global u8 bigcore.health
-global u8 bigcore.state
-global u8 bigcore.timer
-global u16 bigcore.target_y
+// Big Core MK.I Custom Boss - Main Script
+// Compatible with Sonic 3 A.I.R. (26.03.28.0)
 
-// Include other scripts
+// Global variables for Big Core MK.I
+global u8 BigCore.Health
+global u8 BigCore.State
+global u8 BigCore.Timer
+global u16 BigCore.TargetY
+global u16 BigCore.PosX
+global u16 BigCore.PosY
+
+// Include necessary scripts
 include bigcore_boss_aiz1
 include render
 include music
+
+// Initialization hook to reset boss variables at level start
+function void InitLevel()
+{
+	base.InitLevel()
+	
+	if (global.zone == 0x00 && global.act == 0) // AIZ 1
+	{
+		BigCore.Health = 8
+		BigCore.State = 0
+		BigCore.Timer = 0
+		BigCore.TargetY = 0
+	}
+}

@@ -1,10 +1,20 @@
 {
 	"Metadata":
 	{
-		"Name": "Big Core MK.I",
+		"Name": "Big Core MK.I Custom Boss Remake",
 		"Author": "DynamicLemon",
-		"Description": "This Mod is a Replace the Fire Breath in Angel Island Zone Act 1 Boss with Big Core MK.I from Gradius",
-		"URL": "",
-		"ModVersion": "5.0",
+		"Description": "This Mod replaces the Fire Breath in Angel Island Zone Act 1 Boss with Big Core MK.I from Gradius. Rewritten with proper global variables and script hooks for S3AIR (26.03.28.0).",
+		"URL": "https://github.com/jesiahghani41-afk/Big-Core-MK.I-Custom-Boss-Remake",
+		"ModVersion": "6.0",
+		"MinGameVersion": "26.03.28.0"
 	},
+	"Config":
+	{
+		"ActiveMods":
+		[
+			"Agent Stone 3 A.I.R.",
+			"Neo Boss Warnings",
+			"Bossbar HUD"
+		]
+	}
 }
