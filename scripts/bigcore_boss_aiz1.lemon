@@ -32,7 +32,6 @@ function void Boss.AIZ1.BaseUpdate()
 	}
 	else if (BigCore.State == BIGCORE_STATE_DEFEATED)
 	{
-		// Defeated logic
 		Boss.BigCore.OnDefeat()
 	}
 	
@@ -41,13 +40,13 @@ function void Boss.AIZ1.BaseUpdate()
 	objA0.position.y.u16 = BigCore.PosY
 	
 	// Handle hits and damage
-	if (BigCore.State != BIGCORE_STATE_INIT && BigCore.State != BIGCORE_STATE_DEFEATED)
+	if (BigCore.State != BIGCORE_STATE_INIT && BigCore.State != BIGCORE_STATE_DEFEATED && BigCore.State != 0xff)
 	{
 		Boss.BigCore.CheckCollisions()
 	}
 	
 	// Render the boss
-	if (BigCore.State != BIGCORE_STATE_INIT)
+	if (BigCore.State != BIGCORE_STATE_INIT && BigCore.State != 0xff)
 	{
 		u8 render_state = 0; // Normal
 		if (objA0.value3b > 0)
@@ -66,7 +65,7 @@ function void Boss.BigCore.Init()
 	boss.remaining_hits = BigCore.Health
 	level.boss_encounter = 1
 	
-	// Start off-screen to the right
+	// Set initial position off-screen to the right
 	BigCore.PosX = camera.position.x.u16 + 400
 	BigCore.PosY = camera.position.y.u16 + 100
 	
@@ -78,6 +77,9 @@ function void Boss.BigCore.WaitForPlayer()
 	// Wait until the player reaches the boss arena
 	// D5.u16 logic from base game to handle different routes
 	u16 target_x = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
+	
+	// Apply screen extension offset for widescreen support
+	target_x -= getScreenExtend()
 	
 	if (camera.position.x.u16 >= target_x)
 	{
@@ -112,6 +114,9 @@ function void Boss.BigCore.FightLoop()
 	else if (BigCore.PosY > player_y + 10)
 		BigCore.PosY -= 1
 		
+	// Subtle horizontal sway
+	BigCore.PosX = (camera.position.x.u16 + 240) + (16 * Math.sin(BigCore.Timer * 2))
+		
 	// Periodic laser fire (every ~2 seconds at 60fps)
 	if (BigCore.Timer % 120 == 0)
 	{
@@ -121,11 +126,13 @@ function void Boss.BigCore.FightLoop()
 
 function void Boss.BigCore.FireLaser()
 {
-	// Play laser sound
+	// Play laser sound (using standard laser sound ID)
 	playSound(0x4f)
 	
 	// Set laser firing visual timer (using object field for convenience)
 	objA0.value3c = 15
+	
+	// In a full implementation, we would spawn actual laser projectile objects here
 }
 
 function void Boss.BigCore.CheckCollisions()
@@ -133,18 +140,22 @@ function void Boss.BigCore.CheckCollisions()
 	// Handle player hitting the boss
 	if (BigCore.Health > 0)
 	{
+		// Use standard S3AIR collision check
 		if (Object.CheckCollisionWithPlayers())
 		{
 			if (canCharacterHurtBoss())
 			{
-				BigCore.Health--
-				boss.remaining_hits = BigCore.Health
-				objA0.value3b = 30 // Flash timer
-				playSound(0x6e) // Hit sound
-				
-				if (BigCore.Health == 0)
+				if (objA0.value3b == 0) // Only take damage if not in flash/invincibility frames
 				{
-					BigCore.State = BIGCORE_STATE_DEFEATED
+					BigCore.Health--
+					boss.remaining_hits = BigCore.Health
+					objA0.value3b = 30 // Flash timer
+					playSound(0x6e) // Hit sound
+					
+					if (BigCore.Health == 0)
+					{
+						BigCore.State = BIGCORE_STATE_DEFEATED
+					}
 				}
 			}
 		}

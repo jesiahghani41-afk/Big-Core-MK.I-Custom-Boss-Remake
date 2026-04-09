@@ -10,6 +10,15 @@ global u16 BigCore.TargetY
 global u16 BigCore.PosX
 global u16 BigCore.PosY
 
+// Declare boss functions
+declare function void Boss.BigCore.Init()
+declare function void Boss.BigCore.WaitForPlayer()
+declare function void Boss.BigCore.Entrance()
+declare function void Boss.BigCore.FightLoop()
+declare function void Boss.BigCore.FireLaser()
+declare function void Boss.BigCore.CheckCollisions()
+declare function void Boss.BigCore.OnDefeat()
+
 // Include necessary scripts
 include bigcore_boss_aiz1
 include render
