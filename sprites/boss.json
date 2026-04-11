@@ -2,5 +2,5 @@
 	"bigcore_intro": { "File": "BigCore_Intro.png", "Rect": "0,0,96,64", "Center": "48,32" },
 	"bigcore_normal": { "File": "BigCore.png", "Rect": "0,0,96,64", "Center": "48,32" },
 	"bigcore_hits": { "File": "BigCore.png", "Rect": "96,0,96,64", "Center": "48,32" },
-	"bigcore_laser": { "File": "BigCore_Laser.png", "Rect": "0,0,30,4", "Center": "15,2" },
+	"bigcore_laser": { "File": "BigCore_Laser.png", "Rect": "0,0,30,4", "Center": "15,2" }
 }

@@ -9,20 +9,20 @@ function void BigCore.Render()
 	// Use the sprite from BigCore.png defined in boss.json
 	
 	// Determine which sprite to use based on boss state and invulnerability
-	string spriteName = "bigcore_normal"
+	u64 spriteKey = "bigcore_normal"
 	
 	if (BigCore.BossState == 1) // Intro
 	{
-		spriteName = "bigcore_intro"
+		spriteKey = "bigcore_intro"
 	}
 	else if (BigCore.InvulnerabilityTimer > 0 && (BigCore.InvulnerabilityTimer % 4 < 2))
 	{
-		spriteName = "bigcore_hits" // Flash hit sprite
+		spriteKey = "bigcore_hits" // Flash hit sprite
 	}
 	
 	// Draw the main boss body
-	// objA0.position.x and objA0.position.y should be the current position
-	Renderer.drawCustomSprite(spriteName, objA0.position.x, objA0.position.y, 0, 0, 0x2000)
+	// objA0.position.x.u16 and objA0.position.y.u16 should be the current position
+	Renderer.drawSprite(spriteKey, objA0.position.x.u16, objA0.position.y.u16, 0, 0, 0x2000)
 	
 	// Render shields if they are remaining
 	if (BigCore.ShieldsRemaining > 0)

@@ -15,8 +15,14 @@ function void BigCore.Initialize()
 	BigCore.InvulnerabilityTimer = 0
 	
 	// Set initial position off-screen
-	objA0.position.x = camera.position.x + getScreenExtend() + 100
-	objA0.position.y = camera.position.y + 100
+	objA0.position.x.u16 = camera.position.x.u16 + getScreenExtend() + 100
+	objA0.position.y.u16 = camera.position.y.u16 + 100
+	
+	// Set up hitbox for collision
+	objA0.box_size.x = 48
+	objA0.box_size.y = 32
+	objA0.hitbox_extends.x = 48
+	objA0.hitbox_extends.y = 32
 }
 
 function void BigCore.Update()
@@ -57,10 +63,10 @@ function void BigCore.Update()
 function void BigCore.IntroMovement()
 {
 	// Move boss from right to center of the screen
-	u16 targetX = camera.position.x + getScreenExtend() - 60
-	if (objA0.position.x > targetX)
+	u16 targetX = camera.position.x.u16 + getScreenExtend() - 60
+	if (objA0.position.x.u16 > targetX)
 	{
-		objA0.position.x -= 2
+		objA0.position.x.u16 -= 2
 	}
 	else
 	{
@@ -68,7 +74,7 @@ function void BigCore.IntroMovement()
 		BigCore.Timer = 0
 		
 		// Play boss music using our music.lemon replacement logic
-		Audio.playMusic("aircraft_carrier")
+		Audio.playAudio("aircraft_carrier")
 	}
 }
 
@@ -76,7 +82,16 @@ function void BigCore.MainAttackPatterns()
 {
 	// Movement: Hover up and down
 	BigCore.Timer++
-	objA0.position.y = camera.position.y + 100 + (sin(BigCore.Timer * 4) * 32 / 256)
+	
+	// Simple sine wave approximation for hovering
+	s16 hoverOffset = 0
+	u8 angle = BigCore.Timer * 2
+	if (angle < 128)
+		hoverOffset = angle / 4
+	else
+		hoverOffset = (256 - angle) / 4
+		
+	objA0.position.y.u16 = camera.position.y.u16 + 100 + hoverOffset
 
 	// Attack: Fire lasers periodically
 	BigCore.LaserTimer++
@@ -102,26 +117,51 @@ function void BigCore.HandleCollision()
 	if (BigCore.BossState != 2 || BigCore.InvulnerabilityTimer > 0)
 		return
 
-	// Check if boss is hit by character
-	// Enemy.HandleBossDamage() handles player collision and returns true if damaged
-	if (Enemy.HandleBossDamage())
+	// Simple collision check with main character
+	s16 dx = char.position.x.u16 - objA0.position.x.u16
+	s16 dy = char.position.y.u16 - objA0.position.y.u16
+	
+	if (dx < 0) dx = -dx
+	if (dy < 0) dy = -dy
+	
+	if (dx < objA0.hitbox_extends.x && dy < objA0.hitbox_extends.y)
 	{
-		if (BigCore.ShieldsRemaining > 0)
+		// Character hit the boss
+		if (char.state == char.state.ROLLING || char.state == char.state.SPINDASH)
 		{
-			BigCore.ShieldsRemaining--
-			BigCore.InvulnerabilityTimer = 30 // Shorter invulnerability for shields
-			Audio.playSound(0x4a) // Shield hit sound
-		}
-		else
-		{
-			BigCore.RemainingHits--
-			BigCore.InvulnerabilityTimer = 60 // Longer invulnerability for core hits
-			
-			if (BigCore.RemainingHits == 0)
+			// Character is attacking
+			if (BigCore.ShieldsRemaining > 0)
 			{
-				BigCore.BossState = 3
-				BigCore.Timer = 0
+				BigCore.ShieldsRemaining--
+				BigCore.InvulnerabilityTimer = 30 // Shorter invulnerability for shields
+				Audio.playAudio(0x4a) // Shield hit sound
 			}
+			else
+			{
+				BigCore.RemainingHits--
+				BigCore.InvulnerabilityTimer = 60 // Longer invulnerability for core hits
+				
+				if (BigCore.RemainingHits == 0)
+				{
+					BigCore.BossState = 3
+					BigCore.Timer = 0
+					
+					// Stop music
+					Audio.stopChannel(0)
+				}
+			}
+			
+			// Bounce character off
+			char.velocity.y = -0x300
+			if (char.position.x.u16 < objA0.position.x.u16)
+				char.velocity.x = -0x200
+			else
+				char.velocity.x = 0x200
+		}
+		else if (char.invulnerability_timer == 0)
+		{
+			// Character gets hurt
+			Character.GettingHurt()
 		}
 	}
 }
@@ -133,10 +173,10 @@ function void BigCore.Defeated()
 	if (BigCore.Timer % 10 == 0)
 	{
 		// Spawn explosions at random offsets around the boss
-		u8 xOffset = (BigCore.Timer * 13) % 64 - 32
-		u8 yOffset = (BigCore.Timer * 7) % 48 - 24
+		s16 xOffset = (BigCore.Timer * 13) % 64 - 32
+		s16 yOffset = (BigCore.Timer * 7) % 48 - 24
 		spawnChildObject(0x068d88, 0x00, xOffset, yOffset)
-		Audio.playSound(0x6e) // Explosion sound
+		Audio.playAudio(0x6e) // Explosion sound
 	}
 
 	if (BigCore.Timer > 120)

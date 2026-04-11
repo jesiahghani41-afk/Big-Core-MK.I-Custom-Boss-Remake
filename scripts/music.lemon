@@ -11,7 +11,7 @@ function void playMusic(u8 musicId)
 	if (musicId == 0x18 && BigCore.BossState != 0)
 	{
 		// Use the symbolic name defined in audio_replacements.json
-		Audio.playMusic("aircraft_carrier")
+		Audio.playAudio("aircraft_carrier")
 		return
 	}
 	
@@ -22,5 +22,5 @@ function void playMusic(u8 musicId)
 function void BigCore.PlayLaserSound()
 {
 	// Use the symbolic name defined in audio_replacements.json
-	Audio.playSound("laser_beam")
+	Audio.playAudio("laser_beam")
 }
