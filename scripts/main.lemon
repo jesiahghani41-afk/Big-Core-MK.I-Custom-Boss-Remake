@@ -3,6 +3,7 @@
 // Targeted at S3AIR v26.03.28.0
 
 // Global Variables for Big Core Boss
+// Using "BigCore." prefix to avoid conflicts with other mods
 global u8 BigCore.BossState
 global u8 BigCore.RemainingHits
 global u16 BigCore.PosX
@@ -14,7 +15,9 @@ global u8 BigCore.LaserTimer
 global u8 BigCore.InvulnerabilityTimer
 
 // Include other script files
-include boss_aiz1
+// Order matters: logic should be defined before hooks if possible, 
+// but Lemon usually handles this well.
 include bigcore_boss_aiz1
+include boss_aiz1
 include render
 include music

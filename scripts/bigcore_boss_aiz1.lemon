@@ -74,7 +74,8 @@ function void BigCore.IntroMovement()
 		BigCore.Timer = 0
 		
 		// Play boss music using our music.lemon replacement logic
-		Audio.playAudio("aircraft_carrier")
+		// We trigger this by setting the state, music.lemon hooks playMusic
+		playMusic(0x18)
 	}
 }
 
@@ -107,8 +108,8 @@ function void BigCore.FireLasers()
 	// Logic to spawn laser objects
 	BigCore.PlayLaserSound()
 	
-	// Spawning lasers would usually involve spawning a child object
-	// For this logic, we'll assume lasers are drawn in the render function
+	// For this remake, we'll assume lasers are drawn in the render function
+	// and we'll use a timer to show them
 }
 
 function void BigCore.HandleCollision()

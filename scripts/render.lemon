@@ -31,6 +31,12 @@ function void BigCore.Render()
 		// For this remake, we assume shields are part of the core area
 	}
 	
+	// Render lasers if they are being fired
+	if (BigCore.LaserTimer < 30 && BigCore.BossState == 2)
+	{
+		BigCore.RenderLasers()
+	}
+	
 	// Ensure it is added as a dynamic object for the engine's sorting
 	AddAsDynamicObject()
 }
@@ -40,4 +46,12 @@ function void BigCore.RenderLasers()
 	// Logic to render laser beam sprites
 	// Use BigCore_Laser.png defined in boss.json
 	// Lasers would typically be separate objects or rendered here in a loop
+	
+	// Simple laser rendering: draw 3 beams from the front of the boss
+	u16 laserX = objA0.position.x.u16 - 40
+	u16 laserY = objA0.position.y.u16
+	
+	Renderer.drawSprite("bigcore_laser", laserX - 20, laserY - 10, 0, 0, 0x2001)
+	Renderer.drawSprite("bigcore_laser", laserX - 20, laserY, 0, 0, 0x2001)
+	Renderer.drawSprite("bigcore_laser", laserX - 20, laserY + 10, 0, 0, 0x2001)
 }
