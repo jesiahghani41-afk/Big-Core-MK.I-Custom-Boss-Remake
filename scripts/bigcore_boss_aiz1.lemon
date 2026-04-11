@@ -1,0 +1,122 @@
+/*
+	Sonic 3 A.I.R. - Big Core MK.I Custom Boss
+	Boss Logic: Movement, Attacks, and Collision
+*/
+
+function void BigCore.Initialize()
+{
+	BigCore.RemainingHits = 8
+	BigCore.BossState = 0
+	BigCore.Phase = 0
+	BigCore.Timer = 0
+	BigCore.ShieldsRemaining = 3
+	BigCore.LaserTimer = 0
+	
+	// Set initial position off-screen
+	objA0.position.x = camera.position.x + getScreenExtend() + 100
+	objA0.position.y = camera.position.y + 100
+}
+
+function void BigCore.Update()
+{
+	// Handle boss states
+	if (BigCore.BossState == 0)
+	{
+		// Idle/Waiting state
+		fn068a6e() // Check for activation
+	}
+	else if (BigCore.BossState == 1)
+	{
+		// Boss Intro: Move into position
+		BigCore.IntroMovement()
+	}
+	else if (BigCore.BossState == 2)
+	{
+		// Boss Main Phase: Attack patterns
+		BigCore.MainAttackPatterns()
+	}
+	else if (BigCore.BossState == 3)
+	{
+		// Boss Defeated: Explosion and Signpost
+		BigCore.Defeated()
+	}
+
+	// Collision and Rendering
+	BigCore.HandleCollision()
+	BigCore.Render()
+}
+
+function void BigCore.IntroMovement()
+{
+	// Move boss from right to center of the screen
+	u16 targetX = camera.position.x + getScreenExtend() - 60
+	if (objA0.position.x > targetX)
+	{
+		objA0.position.x -= 2
+	}
+	else
+	{
+		BigCore.BossState = 2 // Switch to main attack phase
+		BigCore.Timer = 0
+		playMusic(0x18) // Play boss music
+	}
+}
+
+function void BigCore.MainAttackPatterns()
+{
+	// Movement: Hover up and down
+	BigCore.Timer++
+	objA0.position.y = camera.position.y + 100 + (sin(BigCore.Timer * 4) * 32 / 256)
+
+	// Attack: Fire lasers periodically
+	BigCore.LaserTimer++
+	if (BigCore.LaserTimer >= 120)
+	{
+		BigCore.FireLasers()
+		BigCore.LaserTimer = 0
+	}
+}
+
+function void BigCore.FireLasers()
+{
+	// Logic to spawn laser objects
+	playSound(0x4f) // Use a laser-like sound
+	// In a real mod, you'd spawn child objects for lasers
+}
+
+function void BigCore.HandleCollision()
+{
+	// Only handle damage if in main phase
+	if (BigCore.BossState != 2)
+		return
+
+	// Check if boss is hit by character
+	if (Enemy.HandleBossDamage())
+	{
+		BigCore.RemainingHits--
+		if (BigCore.RemainingHits == 0)
+		{
+			BigCore.BossState = 3
+			BigCore.Timer = 0
+		}
+	}
+}
+
+function void BigCore.Defeated()
+{
+	// Defeated animation and spawning signpost
+	BigCore.Timer++
+	if (BigCore.Timer % 10 == 0)
+	{
+		// Spawn explosions
+		spawnChildObject(0x068d88, 0x00, (BigCore.Timer * 10) % 64 - 32, (BigCore.Timer * 7) % 48 - 24)
+	}
+
+	if (BigCore.Timer > 120)
+	{
+		// Trigger end of boss encounter
+		level.boss_encounter = 0
+		SetupAsSignpostSpawner()
+		Object.TriggerUnloading()
+	}
+}

@@ -1,1 +1,18 @@
+// Sonic 3 A.I.R. - Big Core MK.I Custom Boss
+// Replacement for AIZ Act 1 Boss (Fire Breath)
+
+// Global Variables for Big Core Boss
+global u8 BigCore.BossState
+global u8 BigCore.RemainingHits
+global u16 BigCore.PosX
+global u16 BigCore.PosY
+global u8 BigCore.Phase
+global u8 BigCore.Timer
+global u8 BigCore.ShieldsRemaining
+global u8 BigCore.LaserTimer
+
+// Include other script files
 include boss_aiz1
+include bigcore_boss_aiz1
+include render
+include music

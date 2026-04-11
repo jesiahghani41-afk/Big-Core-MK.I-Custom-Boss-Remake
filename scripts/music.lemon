@@ -1,0 +1,20 @@
+/*
+	Sonic 3 A.I.R. - Big Core MK.I Custom Boss
+	Music handling for boss encounter
+*/
+
+// Hook the playMusic function to replace AIZ 1 Boss music with Big Core music
+//# address-hook(0x00839e) end(0x0083a2)
+function void playMusic(u8 musicId)
+{
+	// Replace the original AIZ 1 Boss music (0x18) with the custom Big Core track
+	if (musicId == 0x18)
+	{
+		// In a real mod, you'd define a custom track in audio_replacements.json
+		// or play a specific OGG file from the audio folder
+		// For now, we'll let it play the original or a custom track defined elsewhere
+	}
+	
+	// Call the original playMusic function
+	base.playMusic(musicId)
+}

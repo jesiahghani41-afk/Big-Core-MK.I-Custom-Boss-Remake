@@ -1,0 +1,29 @@
+/*
+	Sonic 3 A.I.R. - Big Core MK.I Custom Boss
+	Rendering logic for boss and lasers
+*/
+
+function void BigCore.Render()
+{
+	// Render the Big Core main body
+	// Use the sprite from BigCore.png defined in boss.json
+	
+	// Example of drawing a sprite manually using drawObject
+	// objA0.position.x and objA0.position.y should be the current position
+	
+	// Render shields if they are remaining
+	if (BigCore.ShieldsRemaining > 0)
+	{
+		// Draw shield sprites
+	}
+	
+	// Add as dynamic object to be rendered by the engine
+	AddAsDynamicObject()
+	DrawObject()
+}
+
+function void BigCore.RenderLasers()
+{
+	// Logic to render laser beam sprites
+	// Use BigCore_Laser.png defined in boss.json
+}
