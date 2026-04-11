@@ -1,3 +1,7 @@
 {
+	// Music
 	"aircraft_carrier": { "File": "Aircraft Carrier.ogg", "Type": "Music", "Name": "Gradius Original Soundtrack"}
+	
+	// SFX
+	"laser_beam": { "File": "LaserBeam.ogg", "Type": "Sound" },
 }
