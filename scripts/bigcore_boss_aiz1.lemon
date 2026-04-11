@@ -1,6 +1,7 @@
 /*
 	Sonic 3 A.I.R. - Big Core MK.I Custom Boss
 	Boss Logic: Movement, Attacks, and Collision
+	Targeted at S3AIR v26.03.28.0
 */
 
 function void BigCore.Initialize()
@@ -11,6 +12,7 @@ function void BigCore.Initialize()
 	BigCore.Timer = 0
 	BigCore.ShieldsRemaining = 3
 	BigCore.LaserTimer = 0
+	BigCore.InvulnerabilityTimer = 0
 	
 	// Set initial position off-screen
 	objA0.position.x = camera.position.x + getScreenExtend() + 100
@@ -41,6 +43,12 @@ function void BigCore.Update()
 		BigCore.Defeated()
 	}
 
+	// Update invulnerability timer
+	if (BigCore.InvulnerabilityTimer > 0)
+	{
+		BigCore.InvulnerabilityTimer--
+	}
+
 	// Collision and Rendering
 	BigCore.HandleCollision()
 	BigCore.Render()
@@ -58,7 +66,9 @@ function void BigCore.IntroMovement()
 	{
 		BigCore.BossState = 2 // Switch to main attack phase
 		BigCore.Timer = 0
-		playMusic(0x18) // Play boss music
+		
+		// Play boss music using our music.lemon replacement logic
+		Audio.playMusic("aircraft_carrier")
 	}
 }
 
@@ -80,24 +90,38 @@ function void BigCore.MainAttackPatterns()
 function void BigCore.FireLasers()
 {
 	// Logic to spawn laser objects
-	playSound(0x4f) // Use a laser-like sound
-	// In a real mod, you'd spawn child objects for lasers
+	BigCore.PlayLaserSound()
+	
+	// Spawning lasers would usually involve spawning a child object
+	// For this logic, we'll assume lasers are drawn in the render function
 }
 
 function void BigCore.HandleCollision()
 {
-	// Only handle damage if in main phase
-	if (BigCore.BossState != 2)
+	// Only handle damage if in main phase and not invulnerable
+	if (BigCore.BossState != 2 || BigCore.InvulnerabilityTimer > 0)
 		return
 
 	// Check if boss is hit by character
+	// Enemy.HandleBossDamage() handles player collision and returns true if damaged
 	if (Enemy.HandleBossDamage())
 	{
-		BigCore.RemainingHits--
-		if (BigCore.RemainingHits == 0)
+		if (BigCore.ShieldsRemaining > 0)
 		{
-			BigCore.BossState = 3
-			BigCore.Timer = 0
+			BigCore.ShieldsRemaining--
+			BigCore.InvulnerabilityTimer = 30 // Shorter invulnerability for shields
+			Audio.playSound(0x4a) // Shield hit sound
+		}
+		else
+		{
+			BigCore.RemainingHits--
+			BigCore.InvulnerabilityTimer = 60 // Longer invulnerability for core hits
+			
+			if (BigCore.RemainingHits == 0)
+			{
+				BigCore.BossState = 3
+				BigCore.Timer = 0
+			}
 		}
 	}
 }
@@ -108,8 +132,11 @@ function void BigCore.Defeated()
 	BigCore.Timer++
 	if (BigCore.Timer % 10 == 0)
 	{
-		// Spawn explosions
-		spawnChildObject(0x068d88, 0x00, (BigCore.Timer * 10) % 64 - 32, (BigCore.Timer * 7) % 48 - 24)
+		// Spawn explosions at random offsets around the boss
+		u8 xOffset = (BigCore.Timer * 13) % 64 - 32
+		u8 yOffset = (BigCore.Timer * 7) % 48 - 24
+		spawnChildObject(0x068d88, 0x00, xOffset, yOffset)
+		Audio.playSound(0x6e) // Explosion sound
 	}
 
 	if (BigCore.Timer > 120)

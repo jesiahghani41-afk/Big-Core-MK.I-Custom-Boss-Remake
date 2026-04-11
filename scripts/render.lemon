@@ -8,22 +8,36 @@ function void BigCore.Render()
 	// Render the Big Core main body
 	// Use the sprite from BigCore.png defined in boss.json
 	
-	// Example of drawing a sprite manually using drawObject
+	// Determine which sprite to use based on boss state and invulnerability
+	string spriteName = "bigcore_normal"
+	
+	if (BigCore.BossState == 1) // Intro
+	{
+		spriteName = "bigcore_intro"
+	}
+	else if (BigCore.InvulnerabilityTimer > 0 && (BigCore.InvulnerabilityTimer % 4 < 2))
+	{
+		spriteName = "bigcore_hits" // Flash hit sprite
+	}
+	
+	// Draw the main boss body
 	// objA0.position.x and objA0.position.y should be the current position
+	Renderer.drawCustomSprite(spriteName, objA0.position.x, objA0.position.y, 0, 0, 0x2000)
 	
 	// Render shields if they are remaining
 	if (BigCore.ShieldsRemaining > 0)
 	{
-		// Draw shield sprites
+		// Draw shield sprites (assuming they are part of the boss body or separate)
+		// For this remake, we assume shields are part of the core area
 	}
 	
-	// Add as dynamic object to be rendered by the engine
+	// Ensure it is added as a dynamic object for the engine's sorting
 	AddAsDynamicObject()
-	DrawObject()
 }
 
 function void BigCore.RenderLasers()
 {
 	// Logic to render laser beam sprites
 	// Use BigCore_Laser.png defined in boss.json
+	// Lasers would typically be separate objects or rendered here in a loop
 }

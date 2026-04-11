@@ -2,9 +2,11 @@
 	Sonic 3 A.I.R. - Big Core MK.I Custom Boss
 	Replacement for AIZ Act 1 Boss (Fire Breath)
 	Hooking into the original boss functions
+	Targeted at S3AIR v26.03.28.0
 */
 
-// Hook the main update function for AIZ 1 Boss
+// Hook the main update function for AIZ 1 Boss (Fire Breath)
+// This replaces the original update function for object 0x4d (AIZ1 Boss)
 //# address-hook(0x068a24) end(0x068a32)
 function void Boss.AIZ1.BaseUpdate()
 {
@@ -13,10 +15,12 @@ function void Boss.AIZ1.BaseUpdate()
 }
 
 // Override initialization to set up Big Core
+// This replaces the initialization logic for object 0x4d
 //# address-hook(0x068a46) end(0x068a68)
 function void fn068a46()
 {
-	// Original initialization
+	// Original initialization call
+	// This sets the object's attributes and internal flags
 	setupObjectAttributesFull(0x068ffe)
 	level.boss_encounter = 1
 	
@@ -24,17 +28,20 @@ function void fn068a46()
 	BigCore.Initialize()
 }
 
-// Override the state where it waits for the character
+// Override the state where it waits for the character to enter the boss arena
 //# address-hook(0x068a6e) end(0x068a90)
 function void fn068a6e()
 {
 	// Standard camera check for boss activation
-	D5.u16 = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
-	D5.u16 -= getScreenExtend()
+	// D5.u16 = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
+	// getScreenExtend() adjusts for wider screens in S3AIR
+	
+	u16 activationX = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
+	activationX -= getScreenExtend()
 
-	if (camera.position.x.u16 >= D5.u16)
+	if (camera.position.x.u16 >= activationX)
 	{
-		objA0.base_state = 0x04 // Move to our custom state logic
-		BigCore.BossState = 1    // Activate Big Core
+		objA0.base_state = 0x04 // Custom state routing
+		BigCore.BossState = 1    // Activate Big Core Intro
 	}
 }

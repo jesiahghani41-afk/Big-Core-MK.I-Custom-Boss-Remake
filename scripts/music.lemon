@@ -8,13 +8,19 @@
 function void playMusic(u8 musicId)
 {
 	// Replace the original AIZ 1 Boss music (0x18) with the custom Big Core track
-	if (musicId == 0x18)
+	if (musicId == 0x18 && BigCore.BossState != 0)
 	{
-		// In a real mod, you'd define a custom track in audio_replacements.json
-		// or play a specific OGG file from the audio folder
-		// For now, we'll let it play the original or a custom track defined elsewhere
+		// Use the symbolic name defined in audio_replacements.json
+		Audio.playMusic("aircraft_carrier")
+		return
 	}
 	
 	// Call the original playMusic function
 	base.playMusic(musicId)
+}
+
+function void BigCore.PlayLaserSound()
+{
+	// Use the symbolic name defined in audio_replacements.json
+	Audio.playSound("laser_beam")
 }

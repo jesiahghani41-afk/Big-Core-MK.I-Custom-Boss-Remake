@@ -1,5 +1,6 @@
 // Sonic 3 A.I.R. - Big Core MK.I Custom Boss
 // Replacement for AIZ Act 1 Boss (Fire Breath)
+// Targeted at S3AIR v26.03.28.0
 
 // Global Variables for Big Core Boss
 global u8 BigCore.BossState
@@ -10,6 +11,7 @@ global u8 BigCore.Phase
 global u8 BigCore.Timer
 global u8 BigCore.ShieldsRemaining
 global u8 BigCore.LaserTimer
+global u8 BigCore.InvulnerabilityTimer
 
 // Include other script files
 include boss_aiz1
