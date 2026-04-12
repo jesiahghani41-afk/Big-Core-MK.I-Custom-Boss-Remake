@@ -8,23 +8,17 @@
 		"ModVersion": "6.0",
 		"MinGameVersion": "26.03.28.0"
 	},
-	"Config":
-	{
-		"ActiveMods":
-		[
-			{
+    "OtherMods": {
 				"ID": "s3air_bosswarnings",
 				"DisplayName": "Boss Warnings",
 				"IsRequired": "0",
 				"Priority": "Higher"
 			},
-			{
 				"ID": "agent-stone-sonic-3-hazelspooder",
 				"DisplayName": "Stone 3 A.I.R.",
 				"IsRequired": "0",
 				"Priority": "Lower"
 			},
-			{
 				"ID": "Bossbar",
 				"DisplayName": "Bossbar",
 				"IsRequired": "0",
