@@ -1,0 +1,39 @@
+//-------------------------------------------------------//
+// Big Core MK.I Rendering Logic                         //
+//-------------------------------------------------------//
+
+// Hook into the rendering pipeline
+//# address-hook(0x00d924) end(0x00d936)
+function void Renderer.drawCustomSprite(u32 sprite_name, s16 px, s16 py, u8 render_flags, u32 sprite_priority)
+{
+	// Check for Big Core sprites from boss.json
+	if (sprite_name == "bigcore_normal" || sprite_name == "bigcore_hits" || sprite_name == "bigcore_intro" || sprite_name == "bigcore_laser")
+	{
+		Renderer.drawSprite(sprite_name, px, py, render_flags, sprite_priority)
+		return
+	}
+	
+	// Fallback to default rendering
+	base.Renderer.drawCustomSprite(sprite_name, px, py, render_flags, sprite_priority)
+}
+
+function void BigCore.DrawSprites()
+{
+	u32 sprite_to_draw = "bigcore_normal"
+	
+	// Use hit sprite if flashing
+	if (objA0.state > 0 && (objA0.state & 0x02))
+	{
+		sprite_to_draw = "bigcore_hits"
+	}
+	
+	// Draw the main body
+	Renderer.drawCustomSprite(sprite_to_draw, objA0.position.x.u16 - camera.position.x.u16, objA0.position.y.u16 - camera.position.y.u16, objA0.render_flags, 0x8000)
+	
+	// Draw lasers if active
+	if (BigCore.State == 2)
+	{
+		// Simple laser rendering
+		Renderer.drawCustomSprite("bigcore_laser", objA0.position.x.u16 - camera.position.x.u16 - 40, objA0.position.y.u16 - camera.position.y.u16, objA0.render_flags, 0x8001)
+	}
+}

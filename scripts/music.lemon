@@ -1,0 +1,30 @@
+//-------------------------------------------------------//
+// Big Core MK.I Music and SFX Logic                     //
+//-------------------------------------------------------//
+
+// Play custom boss theme for Big Core
+function void BigCore.PlayMusic()
+{
+	// aircraft_carrier is the ID from audio_replacements.json
+	playMusic("aircraft_carrier")
+}
+
+function void BigCore.PlayLaserSFX()
+{
+	// laser_beam is the ID from audio_replacements.json
+	playSound("laser_beam")
+}
+
+// Hook into music playback to ensure Big Core theme plays during AIZ 1 boss
+//# address-hook(0x0113f8) end(0x011406)
+function void PlayMusic(u8 music_id)
+{
+	// 0x24 is the original AIZ 1 boss music ID
+	if (music_id == 0x24 && global.zone == 0x00 && global.act == 0)
+	{
+		BigCore.PlayMusic()
+		return
+	}
+	
+	base.PlayMusic(music_id)
+}

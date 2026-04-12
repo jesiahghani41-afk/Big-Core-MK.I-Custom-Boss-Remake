@@ -1,1 +1,44 @@
+//-------------------------------------------------------//
+// Big Core MK.I Custom Boss Mod                         //
+// Main Script Entry Point                               //
+//-------------------------------------------------------//
+
+// Include all required Lemon files
 include boss_aiz1
+include bigcore_boss_aiz1
+include render
+include music
+
+// Define mod-specific global variables
+global u8 BigCore.Hits
+global u8 BigCore.State
+global u16 BigCore.Timer
+global s16 BigCore.TargetX
+global s16 BigCore.TargetY
+global u8 BigCore.Shields[4]
+global u8 BigCore.LaserTimer
+
+// Hook into mod initialization
+function void InitMod()
+{
+	// Initialization code if needed
+}
+
+// Ensure global variables are reset when level starts
+//# address-hook(0x006796) end(0x00679e)
+function void Level.Init()
+{
+	base.Level.Init()
+	
+	if (global.zone == 0x00 && global.act == 0)
+	{
+		BigCore.Hits = 8
+		BigCore.State = 0
+		BigCore.Timer = 0
+		BigCore.LaserTimer = 0
+		BigCore.Shields[0] = 1
+		BigCore.Shields[1] = 1
+		BigCore.Shields[2] = 1
+		BigCore.Shields[3] = 1
+	}
+}

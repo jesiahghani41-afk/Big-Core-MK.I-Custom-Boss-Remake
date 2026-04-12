@@ -33,17 +33,12 @@ function void Boss.AIZ1.BaseUpdate()
 //# address-hook(0x068a46) end(0x068a68)
 function void fn068a46()
 {
-	setupObjectAttributesFull(0x068ffe)
-	boss.remaining_hits = 6
-	level.boss_encounter = 1
-
-	requestLoadingPatterns(0x5a)		// Boss sprites
-	loadPaletteLine1(0x06917c)
-
-#if STANDALONE
-	// Move to the right, so that there is no dead corner where character is behind him
-//	objA0.position.x.u16 += max(getScreenExtend() - 8, 0)
-#endif
+	// Redirect initialization to Big Core MK.I
+	BigCore.Initialize()
+	
+	// Original patterns/palette for fallback or reference
+	// requestLoadingPatterns(0x5a)
+	// loadPaletteLine1(0x06917c)
 }
 
 
