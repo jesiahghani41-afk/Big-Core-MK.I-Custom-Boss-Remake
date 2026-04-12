@@ -12,9 +12,24 @@
 	{
 		"ActiveMods":
 		[
-			"Agent Stone 3 A.I.R.",
-			"Neo Boss Warnings",
-			"Bossbar HUD"
+			{
+				"ID": "s3air_bosswarnings",
+				"DisplayName": "Boss Warnings",
+				"IsRequired": "0",
+				"Priority": "Higher"
+			},
+			{
+				"ID": "agent-stone-sonic-3-hazelspooder",
+				"DisplayName": "Stone 3 A.I.R.",
+				"IsRequired": "0",
+				"Priority": "Lower"
+			},
+			{
+				"ID": "Bossbar",
+				"DisplayName": "Bossbar",
+				"IsRequired": "0",
+				"Priority": "Lower"
+			}
 		]
 	}
 }
