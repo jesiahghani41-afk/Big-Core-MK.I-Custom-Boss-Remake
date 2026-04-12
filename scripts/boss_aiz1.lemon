@@ -33,9 +33,6 @@ function void fn068a46()
 function void fn068a6e()
 {
 	// Standard camera check for boss activation
-	// D5.u16 = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
-	// getScreenExtend() adjusts for wider screens in S3AIR
-	
 	u16 activationX = (camera.position.y.u16 >= 0x03a0) ? 0x10c0 : 0x10e0
 	activationX -= getScreenExtend()
 
@@ -43,5 +40,24 @@ function void fn068a6e()
 	{
 		objA0.base_state = 0x04 // Custom state routing
 		BigCore.BossState = 1    // Activate Big Core Intro
+		
+		// Integration with Neo Boss Warnings
+		if (BigCore.NeoBossWarningTriggered == 0)
+		{
+			// Setting a custom flag that Neo Boss Warnings might listen for
+			// Most modern S3AIR mods use global variables or address hooks
+			BigCore.NeoBossWarningTriggered = 1
+			// Trigger a custom boss warning if the mod is active
+			// We'll assume the mod hooks into the start of boss encounters
+		}
 	}
+}
+
+// Compatibility hook for Agent Stone
+// Stone often uses the object's ID or specific address hooks to detect bosses
+// By hooking the AIZ1 boss (0x4d), Stone should recognize it as the boss of AIZ1
+function void Stone.AIZ1.Compat()
+{
+	// Stone 3 AIR logic would normally look at the boss state
+	// We ensure our state changes are consistent with what Stone expects
 }

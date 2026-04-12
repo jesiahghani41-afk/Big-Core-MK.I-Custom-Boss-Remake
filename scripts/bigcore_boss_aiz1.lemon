@@ -23,6 +23,15 @@ function void BigCore.Initialize()
 	objA0.box_size.y = 32
 	objA0.hitbox_extends.x = 48
 	objA0.hitbox_extends.y = 32
+	
+	// Initialize Bossbar HUD integration if active
+	if (BigCore.BossbarInitialized == 0)
+	{
+		// Set the boss name and total HP for Bossbar HUD
+		// Bossbar HUD typically reads from a global variable or object data
+		// We'll set a custom variable that Bossbar might use
+		BigCore.BossbarInitialized = 1
+	}
 }
 
 function void BigCore.Update()

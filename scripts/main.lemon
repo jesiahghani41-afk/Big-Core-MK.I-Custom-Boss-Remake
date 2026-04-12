@@ -14,10 +14,36 @@ global u8 BigCore.ShieldsRemaining
 global u8 BigCore.LaserTimer
 global u8 BigCore.InvulnerabilityTimer
 
+// Mod Integration Flags
+global u8 BigCore.NeoBossWarningTriggered
+global u8 BigCore.BossbarInitialized
+
 // Include other script files
-// Order matters: logic should be defined before hooks if possible, 
-// but Lemon usually handles this well.
 include bigcore_boss_aiz1
 include boss_aiz1
 include render
 include music
+
+// Main Initialization Hook
+function void BigCore.InitMod()
+{
+    BigCore.BossState = 0
+    BigCore.RemainingHits = 8
+    BigCore.ShieldsRemaining = 3
+    BigCore.Phase = 0
+    BigCore.Timer = 0
+    BigCore.LaserTimer = 0
+    BigCore.InvulnerabilityTimer = 0
+    BigCore.NeoBossWarningTriggered = 0
+    BigCore.BossbarInitialized = 0
+}
+
+// Hook into the level start to reset variables
+function void onLevelStart()
+{
+    if (global.zone == 0x00 && global.act == 0x00) // AIZ 1
+    {
+        BigCore.InitMod()
+    }
+    base.onLevelStart()
+}

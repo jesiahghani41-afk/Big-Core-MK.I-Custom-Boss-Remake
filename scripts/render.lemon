@@ -6,8 +6,6 @@
 function void BigCore.Render()
 {
 	// Render the Big Core main body
-	// Use the sprite from BigCore.png defined in boss.json
-	
 	// Determine which sprite to use based on boss state and invulnerability
 	u64 spriteKey = "bigcore_normal"
 	
@@ -21,14 +19,20 @@ function void BigCore.Render()
 	}
 	
 	// Draw the main boss body
-	// objA0.position.x.u16 and objA0.position.y.u16 should be the current position
+	// Render using the position stored in objA0
 	Renderer.drawSprite(spriteKey, objA0.position.x.u16, objA0.position.y.u16, 0, 0, 0x2000)
 	
 	// Render shields if they are remaining
 	if (BigCore.ShieldsRemaining > 0)
 	{
-		// Draw shield sprites (assuming they are part of the boss body or separate)
-		// For this remake, we assume shields are part of the core area
+		// Draw shield sprites
+		// Shield sprites are assumed to be drawn as part of the body or additional sprites
+		// For this remake, we'll draw them as simple small overlays on the core area
+		for (u8 i = 0; i < BigCore.ShieldsRemaining; ++i)
+		{
+			s16 xOffset = -10 + (i * 10)
+			Renderer.drawSprite("bigcore_hits", objA0.position.x.u16 + xOffset, objA0.position.y.u16, 0, 0, 0x2002)
+		}
 	}
 	
 	// Render lasers if they are being fired
@@ -43,10 +47,6 @@ function void BigCore.Render()
 
 function void BigCore.RenderLasers()
 {
-	// Logic to render laser beam sprites
-	// Use BigCore_Laser.png defined in boss.json
-	// Lasers would typically be separate objects or rendered here in a loop
-	
 	// Simple laser rendering: draw 3 beams from the front of the boss
 	u16 laserX = objA0.position.x.u16 - 40
 	u16 laserY = objA0.position.y.u16
