@@ -23,7 +23,8 @@
 				"DisplayName": "Bossbar",
 				"IsRequired": "0",
 				"Priority": "Lower"
-			}
+				}
+			},
 		]
 	}
 }
