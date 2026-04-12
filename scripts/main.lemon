@@ -10,6 +10,7 @@ include render
 include music
 
 // Define mod-specific global variables
+// These are used across multiple scripts for boss state tracking
 global u8 BigCore.Hits
 global u8 BigCore.State
 global u16 BigCore.Timer
@@ -21,15 +22,16 @@ global u8 BigCore.LaserTimer
 // Hook into mod initialization
 function void InitMod()
 {
-	// Initialization code if needed
+	// Mod-wide initialization if needed
 }
 
-// Ensure global variables are reset when level starts
+// Reset global variables when the level starts
 //# address-hook(0x006796) end(0x00679e)
 function void Level.Init()
 {
 	base.Level.Init()
 	
+	// Reset Big Core state if entering Angel Island Zone Act 1
 	if (global.zone == 0x00 && global.act == 0)
 	{
 		BigCore.Hits = 8

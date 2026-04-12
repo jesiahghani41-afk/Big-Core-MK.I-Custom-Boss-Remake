@@ -3,29 +3,30 @@
 	{
 		"Name": "Big Core MK.I Custom Boss Remake",
 		"Author": "DynamicLemon",
-		"UniqueID": "Big-Core-over-AIZ1-Boss"
+		"UniqueID": "Big-Core-over-AIZ1-Boss",
 		"Description": "This Mod replaces the Fire Breath in Angel Island Zone Act 1 Boss with Big Core MK.I from Gradius. Rewritten with proper global variables and script hooks for S3AIR (26.03.28.0).",
 		"URL": "https://github.com/jesiahghani41-afk/Big-Core-MK.I-Custom-Boss-Remake",
 		"ModVersion": "6.0",
 		"MinGameVersion": "26.03.28.0"
 	},
-    "OtherMods": {
-				"ID": "s3air_bosswarnings",
-				"DisplayName": "Boss Warnings",
-				"IsRequired": "0",
-				"Priority": "Higher"
-			},
-				"ID": "agent-stone-sonic-3-hazelspooder",
-				"DisplayName": "Stone 3 A.I.R.",
-				"IsRequired": "0",
-				"Priority": "Lower"
-			},
-				"ID": "Bossbar",
-				"DisplayName": "Bossbar",
-				"IsRequired": "0",
-				"Priority": "Lower"
-				}
-			},
-		]
-	}
+	"OtherMods": [
+		{
+			"ID": "s3air_bosswarnings",
+			"DisplayName": "Boss Warnings",
+			"IsRequired": "0",
+			"Priority": "Higher"
+		},
+		{
+			"ID": "agent-stone-sonic-3-hazelspooder",
+			"DisplayName": "Stone 3 A.I.R.",
+			"IsRequired": "0",
+			"Priority": "Lower"
+		},
+		{
+			"ID": "Bossbar",
+			"DisplayName": "Bossbar",
+			"IsRequired": "0",
+			"Priority": "Lower"
+		}
+	]
 }

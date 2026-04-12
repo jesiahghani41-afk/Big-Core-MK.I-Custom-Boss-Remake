@@ -2,29 +2,33 @@
 // Big Core MK.I Music and SFX Logic                     //
 //-------------------------------------------------------//
 
-// Play custom boss theme for Big Core
+// Play the custom boss theme for Big Core
 function void BigCore.PlayMusic()
 {
-	// aircraft_carrier is the ID from audio_replacements.json
+	// "aircraft_carrier" is defined in audio_replacements.json
 	playMusic("aircraft_carrier")
 }
 
+// Play the custom laser sound effect
 function void BigCore.PlayLaserSFX()
 {
-	// laser_beam is the ID from audio_replacements.json
+	// "laser_beam" is defined in audio_replacements.json
 	playSound("laser_beam")
 }
 
-// Hook into music playback to ensure Big Core theme plays during AIZ 1 boss
+// Hook into the PlayMusic function to ensure Big Core's theme plays 
+// during the Angel Island Zone Act 1 boss encounter.
 //# address-hook(0x0113f8) end(0x011406)
 function void PlayMusic(u8 music_id)
 {
-	// 0x24 is the original AIZ 1 boss music ID
+	// music_id 0x24 is the standard Angel Island Zone boss music
+	// We intercept it only for the first zone and act where Big Core appears.
 	if (music_id == 0x24 && global.zone == 0x00 && global.act == 0)
 	{
 		BigCore.PlayMusic()
 		return
 	}
 	
+	// Fallback to original music playback for all other cases
 	base.PlayMusic(music_id)
 }

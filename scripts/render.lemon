@@ -2,7 +2,7 @@
 // Big Core MK.I Rendering Logic                         //
 //-------------------------------------------------------//
 
-// Hook into the rendering pipeline
+// Hook into the rendering pipeline to draw custom sprites
 //# address-hook(0x00d924) end(0x00d936)
 function void Renderer.drawCustomSprite(u32 sprite_name, s16 px, s16 py, u8 render_flags, u32 sprite_priority)
 {
@@ -13,27 +13,34 @@ function void Renderer.drawCustomSprite(u32 sprite_name, s16 px, s16 py, u8 rend
 		return
 	}
 	
-	// Fallback to default rendering
+	// Fallback to base rendering for other objects
 	base.Renderer.drawCustomSprite(sprite_name, px, py, render_flags, sprite_priority)
 }
 
+// Function to draw the Big Core boss and its parts
 function void BigCore.DrawSprites()
 {
+	// Determine the base sprite to draw (Normal or Hit)
 	u32 sprite_to_draw = "bigcore_normal"
 	
-	// Use hit sprite if flashing
+	// Use hit sprite if boss is flashing
 	if (objA0.state > 0 && (objA0.state & 0x02))
 	{
 		sprite_to_draw = "bigcore_hits"
 	}
 	
-	// Draw the main body
-	Renderer.drawCustomSprite(sprite_to_draw, objA0.position.x.u16 - camera.position.x.u16, objA0.position.y.u16 - camera.position.y.u16, objA0.render_flags, 0x8000)
+	// Calculate relative position to the camera
+	s16 relative_x = objA0.position.x.u16 - camera.position.x.u16
+	s16 relative_y = objA0.position.y.u16 - camera.position.y.u16
 	
-	// Draw lasers if active
+	// Draw the main Big Core body
+	Renderer.drawCustomSprite(sprite_to_draw, relative_x, relative_y, objA0.render_flags, 0x8000)
+	
+	// Draw lasers if boss is in the Firing state (State 2)
 	if (BigCore.State == 2)
 	{
-		// Simple laser rendering
-		Renderer.drawCustomSprite("bigcore_laser", objA0.position.x.u16 - camera.position.x.u16 - 40, objA0.position.y.u16 - camera.position.y.u16, objA0.render_flags, 0x8001)
+		// Render laser sprites relative to the Big Core position
+		// Adjust offset as needed to match the sprite's design
+		Renderer.drawCustomSprite("bigcore_laser", relative_x - 40, relative_y, objA0.render_flags, 0x8001)
 	}
 }
