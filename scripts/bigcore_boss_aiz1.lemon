@@ -27,6 +27,16 @@ function void BigCore.Initialize()
 	// Set the level boss encounter flag
 	level.boss_encounter = 1
 	
+	// Setup Bossbar if active
+	if (Mods.isActiveMods("Bossbar"))
+	{
+		// Bossbar mod expects specific variables to be set for custom bosses
+		// This is a common pattern for Bossbar integration
+		global.boss_max_hp = 8
+		global.boss_hp = 8
+		global.boss_name_sprite = "boss11" // From bossbar.json
+	}
+	
 	// Initialize position
 	objA0.position.x.u16 = camera.position.x.u16 + 400
 	objA0.position.y.u16 = camera.position.y.u16 + 96
@@ -96,6 +106,13 @@ function void BigCore.MainUpdate()
 			if (BigCore.Hits > 0)
 			{
 				BigCore.Hits--
+				
+				// Update Bossbar HP if active
+				if (Mods.isActiveMods("Bossbar"))
+				{
+					global.boss_hp = BigCore.Hits
+				}
+				
 				objA0.state = 0x20 // Hit flashing timer (32 frames)
 				playSound(0x6e)    // Standard boss hit sound
 			}

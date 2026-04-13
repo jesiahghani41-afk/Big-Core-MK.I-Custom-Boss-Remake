@@ -23,6 +23,20 @@ global u8 BigCore.LaserTimer
 function void InitMod()
 {
 	// Mod-wide initialization if needed
+		if (Mods.isActiveMods("Bossbar"))
+		{
+			// Initialize Bossbar specific features if needed
+			// For example, setting up a custom bossbar for Big Core
+			// This would typically involve calling functions from the Bossbar mod API
+			// For now, we just acknowledge its presence.
+			debugLog("Bossbar mod detected and active.")
+		}
+		
+		if (Mods.isActiveMods("agent-stone-sonic-3-hazelspooder")) // UniqueID for Stone 3 A.I.R.
+		{
+			// Initialize Stone 3 A.I.R. specific features if needed
+			debugLog("Stone 3 A.I.R. mod detected and active.")
+		}
 }
 
 // Reset global variables when the level starts
